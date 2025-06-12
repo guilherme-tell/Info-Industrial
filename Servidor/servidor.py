@@ -9,22 +9,27 @@ class Servidor():
         """
         Construtor da classe servidor
         """
-        self._host = host
+        self._host = host           #atributo protegido da classe servidor
         self._port = port
-        self.__tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.__tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  #instanciando um objeto da classe socket
+                                                                        #AF_INET -> address family qualquer dispositivo agrupado nesta familia
+                                                                        #pode receber os beneficios deste serviço
+                                                                        #SOCK_STREAM -> qual o protocolo da camada de transporte 
+                                                                        #este em especifico é para o TCP,
+
 
 
     def start(self):
         """
         Método que inicializa a execução do servidor
         """
-        endpoint = (self._host, self._port)
+        endpoint = (self._host, self._port)     # uma tupla, é um objeto imutavel, nao funciona passagem por atributo
         try:
             self.__tcp.bind(endpoint)
             self.__tcp.listen(1)
             print("Servidor iniciado em ", self._host, ": ", self._port)
             while True:
-                con, client = self.__tcp.accept()
+                con, client = self.__tcp.accept()       #con é o socket do cliente, é o objeto pra onde vou enviar dados para o cliente
                 self._service(con, client)
         except Exception as e:
             print("Erro ao inicializar o servidor", e.args)
