@@ -62,8 +62,8 @@ class Servidor():
                 imag_tam = con.recv(1024)
                 img_tam = int.from_bytes(imag_tam, 'big')
 
-                for i in range(img_tam/1024):
-                    imag_bytes = con.recv(1024)
+                for i in range(round(img_tam/1024)):
+                    imag_bytes += con.recv(1024)
                 img = cv2.imdecode(np.frombuffer(imag_bytes, np.uint8), cv2.IMREAD_COLOR)
 
                 xml_classificador = os.path.join(os.path.relpath(
