@@ -2,6 +2,7 @@ import socket
 import cv2
 import numpy as np
 import os
+import threading
 
 class Servidor():
     """
@@ -80,3 +81,31 @@ class Servidor():
             cv2.rectangle(imagem, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
         return imagem
+
+class ServidorMT(Servidor):
+    """
+    Classe ServidorMT - API Socket Multithread
+    """
+
+    def __init__(self, host, port, nthreads=3):
+        super().__init__(host, port)
+        self._nthreads = nthreads
+        self.__threadPool = {}
+        self.__tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    def start(self):
+
+        endpoint = (self._host, self._port)
+        try:
+            self.__tcp.bind(endpoint)
+            self.__tcp.listen(1)
+
+            print("Servidor iniciado em ", self._host, ": ", self._port)
+            while True:
+                for t in range(self._nthreads):    
+                    con, client = self.__tcp.accept()
+                    self.__threadPool[client].append(threading.Thread(target = self.service, args = (con, client)))
+                    self.__threadPool[client].start()
+        
+        except Exception as e:
+            print("Erro ao inicializar o servidor", e.args) 
