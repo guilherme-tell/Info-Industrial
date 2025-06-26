@@ -61,15 +61,16 @@ class Cliente():
                 tamanho_da_imagem_processada = self.__tcp.recv(1024)
                 tamanho_da_imagem_processada = int.from_bytes(tamanho_da_imagem_processada, 'big')
 
+                numero_de_pacotes = (tamanho_da_imagem_processada + 1023) // 1024  # arredondamento para cima
                 imagem_recebida_bytes = b''
-                for i in range(round(tamanho_da_imagem_processada / 1024)):
+                for i in range(numero_de_pacotes):
                     imagem_recebida_bytes += self.__tcp.recv(1024)
-                    
-                img = cv2.imdecode(np.frombuffer(imagem_recebida_bytes, np.uint8), cv2.IMREAD_COLOR)
 
-                cv2.imshow('Imagem Processada', img)
+                imagem_recebida_bytes = cv2.imdecode(np.frombuffer(imagem_recebida_bytes, np.uint8), cv2.IMREAD_COLOR)
+
+                cv2.imshow('Imagem Processada', imagem_recebida_bytes)
                 cv2.waitKey(0)
-                cv2.destroyAllWindows()
-
+                cv2.destroyAllWindows() 
+                
         except Exception as e:
             print("Erro ao realizar comunicação com o servidor", e.args)
