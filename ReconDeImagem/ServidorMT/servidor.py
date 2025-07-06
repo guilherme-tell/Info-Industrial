@@ -102,10 +102,18 @@ class ServidorMT(Servidor):
 
             print("Servidor iniciado em ", self._host, ": ", self._port)
             while True:
-                for t in range(self._nthreads):    
-                    con, client = self.__tcp.accept()
-                    self.__threadPool[client].append(threading.Thread(target = self.service, args = (con, client)))
-                    self.__threadPool[client].start()
+                # 1. Aguarda uma nova conexão. Esta linha é bloqueante.
+                con, client = self.__tcp.accept()
+                print(f"Nova conexão recebida de {client}")
+
+                # 2. Cria uma thread para cuidar deste cliente
+                #    - target: a função que a thread vai executar (_service)
+                #    - args: os argumentos para a função (a conexão e o cliente)
+                #    - daemon=True: faz com que a thread seja encerrada se o programa principal fechar
+                thread_cliente = threading.Thread(target=self._service, args=(con, client), daemon=True)
+                
+                # 3. Inicia a execução da thread.
+                thread_cliente.start()
         
         except Exception as e:
             print("Erro ao inicializar o servidor", e.args) 
